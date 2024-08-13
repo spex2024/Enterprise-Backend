@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cookieParser())
 app.use(cors({
-    origin: ['http://localhost:3000','http://localhost:3001','http://localhost:3002','http://localhost:3003'], // Replace with your client URL
+    origin: [''], // Replace with your client URL
     credentials: true,
 }));
 
@@ -41,6 +41,10 @@ app.use('/api/enterprise' , agencyRoute)
 app.use('/api/vendor' , vendorRoute)
 app.use('/api/orders' ,orderRoute )
 app.use('/api/admin' ,adminRoute)
+
+app.get((req,res)=>{
+    res.send("Hello");
+})
 // Connect to MongoDB and start server
 connectToMongoDB()
     .then(() => {
