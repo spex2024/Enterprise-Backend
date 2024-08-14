@@ -29,10 +29,10 @@ export const createAdmin = async (req, res) => {
 
         try {
             // Check if admin or username already exists
-            const existingUser = await User.findOne({ $or: [{ email }, { phone }] });
-            const existingVendor = await Vendor.findOne({ $or: [{ email }, { phone }] });
-            const existingAgency = await Agency.findOne({ $or: [{ email }, { phone }] });
-            const existingAdmin = await Admin.findOne({ $or: [{ email }, { phone }] });
+            const existingUser = await User.findOne({ $or: [{ email }] });
+            const existingVendor = await Vendor.findOne({ $or: [{ email }] });
+            const existingAgency = await Agency.findOne({ $or: [{ email }] });
+            const existingAdmin = await Admin.findOne({ $or: [{ email }] });
 
             if (existingUser || existingVendor || existingAgency || existingAdmin) {
                 return res.status(400).json({ message: "Email or phone already in use by another account" });
