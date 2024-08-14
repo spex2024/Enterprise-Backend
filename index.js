@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cookieParser())
 app.use(cors({
-    origin: ['https://admin-interface-three.vercel.app','https://enterprise-interface-nine.vercel.app','https://vendor-interface.vercel.app'], // Replace with your client URL
+    origin: ['https://admin-interface-three.vercel.app','https://enterprise-frontend-blush.vercel.app','https://vendor-interface.vercel.app','https://enterprise-interface.onrender.com',], // Replace with your client URL
     credentials: true,
 }));
 
