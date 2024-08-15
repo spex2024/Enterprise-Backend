@@ -114,13 +114,12 @@ export const signIn = async (req, res) => {
 
         const token = generateToken({ id: admin._id }, '1d');
 
-        // Set the token in a cookie
         res.cookie('token', token, {
-            httpOnly: true, // Ensures the cookie is only accessible via HTTP(S)
-            secure: process.env.NODE_ENV === 'production', // Set to true in production
-            maxAge: 24 * 60 * 60 * 1000,
+            httpOnly: true,
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Use 'none' in production, 'lax' otherwise
+            secure: process.env.NODE_ENV === 'production', // Secure flag true only in production
+            maxAge: 24 * 60 * 60 * 1000, // 1 day
         });
-
         res.status(200).json({ message: "Sign-in successful" });
     } catch (error) {
         console.error(error.message);
