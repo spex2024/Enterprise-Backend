@@ -10,6 +10,7 @@ import orderRoute from './route/auth/orders.js'
 import adminRoute from "./route/auth/admin.js";
 import cookieParser from "cookie-parser";
 import {v2 as cloudinary} from "cloudinary";
+import mongoose from "mongoose";
 
 dotenv.config();
 
@@ -47,15 +48,19 @@ app.get('/', (req, res) => {
 })
 
 // Connect to MongoDB and start server
-connectToMongoDB()
-    .then(() => {
-        app.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT}`);
-        });
-    })
-    .catch((error) => {
-        console.error('Failed to connect to MongoDB', error);
-    });
+// connectToMongoDB()
+//     .then(() => {
+//         app.listen(PORT, () => {
+//             console.log(`Server is running on port ${PORT}`);
+//         });
+//     })
+//     .catch((error) => {
+//         console.error('Failed to connect to MongoDB', error);
+//     });
+
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => app.listen(process.env.PORT ,()=> console.log(`Server connected to the database and running on port ${process.env.PORT}`)))
+    .catch((err) => console.log(`error : ${err.message}`))
 
 
 
