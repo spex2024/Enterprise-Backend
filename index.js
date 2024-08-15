@@ -20,7 +20,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser())
 app.use(cors({
-    origin: ['https://enterprise-interface-taupe.vercel.app',], // Replace with your client URL
+    origin: ['https://enterprise-interface-taupe.vercel.app','https://main.d1lolo334q00y7.amplifyapp.com'], // Replace with your client URL
     credentials: true,
 }));
 
