@@ -2,7 +2,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors'
-import connectToMongoDB from './db/db.js';
 import userRoute from'./route/auth/route.js'
 import agencyRoute from './route/auth/agency.js'
 import vendorRoute from './route/auth/vendor.js'
