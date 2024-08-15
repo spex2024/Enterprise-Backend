@@ -243,10 +243,8 @@ export const agencySignIn = async (req, res) => {
         res.cookie('token', token, {
             httpOnly: true,
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Use 'none' in production, 'lax' otherwise
-            secure: process.env.NODE_ENV === 'production',
-            domain: 'https://main.d1tchh5v04pztk.amplifyapp.com',// Secure flag true only in production
+            secure: process.env.NODE_ENV === 'production', // Secure flag true only in production
             maxAge: 24 * 60 * 60 * 1000, // 1 day
-            path: '/'
         });
 
 
