@@ -20,7 +20,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser())
 app.use(cors({
-    origin: ['https://main.d1tchh5v04pztk.amplifyapp.com','https://main.d1lolo334q00y7.amplifyapp.com','http://localhost:3000'], // Replace with your client URL
+    origin: ['https://main.d1tchh5v04pztk.amplifyapp.com','https://main.d1lolo334q00y7.amplifyapp.com','https://main.d2pyl4na0l0nj7.amplifyapp.com'], // Replace with your client URL
     credentials: true,
 }));
 
