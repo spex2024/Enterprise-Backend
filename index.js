@@ -42,9 +42,10 @@ app.use('/api/vendor' , vendorRoute)
 app.use('/api/orders' ,orderRoute )
 app.use('/api/admin' ,adminRoute)
 
-app.get((req,res)=>{
-    res.send("Hello");
+app.get('/', (req, res) => {
+    res.send('Hello World')
 })
+
 // Connect to MongoDB and start server
 connectToMongoDB()
     .then(() => {
