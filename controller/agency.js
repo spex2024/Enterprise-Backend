@@ -240,13 +240,13 @@ export const agencySignIn = async (req, res) => {
         };
 
         const token = generateToken(payload, '1d');
-
         res.cookie('token', token, {
             httpOnly: true,
-            sameSite:'none',
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 24 * 60 * 60 * 1000,
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Use 'none' in production, 'lax' otherwise
+            secure: process.env.NODE_ENV === 'production', // Secure flag true only in production
+            maxAge: 24 * 60 * 60 * 1000, // 1 day
         });
+
 
         res.json({ message: 'Login successful' });
     } catch (error) {
