@@ -244,7 +244,6 @@ export const agencySignIn = async (req, res) => {
             httpOnly: true,
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',    // Use 'none' in production, 'lax' otherwise
             secure: true, // Secure flag true only in production
-            domain: 'https://main.d1lolo334q00y7.amplifyapp.com',
             maxAge: 24 * 60 * 60 * 1000, // 1 day
         });
 
