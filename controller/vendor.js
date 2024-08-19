@@ -23,10 +23,12 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-const URL = process.env.VENDOR_URL;
+const URL = "https://main.d1tchh5v04pztk.amplifyapp.com";
+const verify = "https://enterprise-backend-l6pn.onrender.com";
+
 
 const sendVerificationEmail = (vendor, emailToken) => {
-    const url = `http://localhost:8080/api/vendor/verify/${emailToken}`;
+    const url = `${verify}/api/vendor/verify/${emailToken}`;
     transporter.sendMail({
         to: vendor.email,
         subject: 'Verify your email',

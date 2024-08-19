@@ -9,7 +9,8 @@ import Admin from "../model/admin.js";
 import User from "../model/user.js";
 import {Vendor} from "../model/vendor.js";
 dotenv.config();
-let URL = process.env.ORG_URL;
+const URL = "https://main.d1lolo334q00y7.amplifyapp.com";
+const verify = "https://enterprise-backend-l6pn.onrender.com";
 const transporter = nodemailer.createTransport({
     service: "gmail",
     host: "smtp.gmail.com",
@@ -22,7 +23,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendVerificationEmail = (agency, emailToken) => {
-    const url = `http://localhost:8080/api/enterprise/verify/${emailToken}`;
+    const url = `${verify}/api/enterprise/verify/${emailToken}`;
     transporter.sendMail({
         to: agency.email,
         subject: 'Verify your email',
