@@ -8,8 +8,11 @@ import { v2 as cloudinary} from 'cloudinary'
 import upload from "../middleware/multer-upload.js";
 import {Vendor} from "../model/vendor.js";
 import Admin from "../model/admin.js";
-URL = process.env.USER_URL;
+
+
 dotenv.config();
+const URL = process.env.USER_URL;
+const verify = process.env.BACKEND_URL;
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -23,7 +26,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendVerificationEmail = (user, emailToken) => {
-    const url = `http://localhost:8080/api/user/verify/${emailToken}`;
+    const url = `${verify}/api/user/verify/${emailToken}`;
     transporter.sendMail({
         to: user.email,
         subject: 'Verify your email',
