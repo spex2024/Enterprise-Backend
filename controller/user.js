@@ -259,10 +259,10 @@ export const signIn = async (req, res) => {
 
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 24 * 60 * 60 * 1000, // 1 hour
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Use 'none' in production, 'lax' otherwise
+            secure: process.env.NODE_ENV === 'production', // Secure flag true only in production
+            maxAge: 24 * 60 * 60 * 1000, // 1 day
         });
-
         res.json({message: 'Login successful'
         });
     } catch (error) {

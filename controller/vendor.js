@@ -280,6 +280,7 @@ export const getSharedVendors = async (req, res) => {
         const user = req.user; // Assume the user is attached to the request
 
 
+
         if (!user) {
             return res.status(401).json({ message: 'Unauthorized access' });
         }
