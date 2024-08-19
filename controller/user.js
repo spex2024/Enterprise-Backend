@@ -26,7 +26,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendVerificationEmail = (user, emailToken) => {
-    const url = `${verify}/api/user/verify/${emailToken}`;
+    const url = `https://enterprise-backend-l6pn.onrender.com/api/user/verify/${emailToken}`;
     transporter.sendMail({
         to: user.email,
         subject: 'Verify your email',
