@@ -11,8 +11,8 @@ import Admin from "../model/admin.js";
 
 
 dotenv.config();
-const URL = process.env.USER_URL;
-const verify = process.env.BACKEND_URL;
+const URL = "https://main.d3h2qrol1316a6.amplifyapp.com";
+const verify = "https://enterprise-backend-l6pn.onrender.com";
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -26,7 +26,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendVerificationEmail = (user, emailToken) => {
-    const url = `https://enterprise-backend-l6pn.onrender.com/api/user/verify/${emailToken}`;
+    const url = `${verify}/api/user/verify/${emailToken}`;
     transporter.sendMail({
         to: user.email,
         subject: 'Verify your email',
