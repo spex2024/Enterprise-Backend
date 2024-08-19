@@ -123,7 +123,7 @@ export const cancelOrder = async (req, res) => {
         }
 
         // Update the order status to "canceled"
-        order.status = 'canceled';
+        order.status = 'cancelled';
         await order.save();
 
         // Find the vendor associated with this order
@@ -136,7 +136,7 @@ export const cancelOrder = async (req, res) => {
         vendor.canceledOrders += 1;  // Assuming you have a canceledOrders field in Vendor schema
         await vendor.save();
 
-        res.status(200).json({ message: 'Order marked as canceled' });
+        res.status(200).json({ message: 'Order marked as cancelled' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: error.message });
