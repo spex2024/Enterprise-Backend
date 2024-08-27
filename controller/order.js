@@ -2,6 +2,7 @@ import { Meal, Vendor } from "../model/vendor.js";
 import Order from "../model/order.js";
 import User from "../model/user.js";
 import jwt from "jsonwebtoken";
+import Pack from "../model/pack.js";
 
 // Function to generate a custom order ID
 const generateOrderId = () => {
@@ -77,13 +78,12 @@ export const placeOrder = async (req, res) => {
     }
 };
 
-
 export const completeOrder = async (req, res) => {
     try {
         const { orderId } = req.body;
 
         // Find the order by ID and ensure it exists
-        const order = await Order.findById(orderId);
+        const order = await Order.findById(orderId).populate('user');
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
         }
@@ -104,12 +104,52 @@ export const completeOrder = async (req, res) => {
         vendor.totalAmount += order.totalPrice;  // Assuming you have a totalAmount field in Vendor schema
         await vendor.save();
 
-        res.status(200).json({ message: 'Order marked as completed' });
+        // Find the user associated with this order
+        const user = await User.findById(order.user);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Check if a pack already exists for the user on the current date
+        const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
+        let pack = await Pack.findOne({ userCode: user.code });
+
+        if (!pack) {
+            // Create a new pack if it doesn't exist
+            pack = await Pack.create({
+                packId: `${user.code}-${currentDate}`,
+                userCode: user.code,
+                userName: user.name,
+                date: currentDate,
+                userAgency: user.agency, // Assuming user has an agency field
+                status: 'active'
+            });
+        } else {
+            // If the pack exists, update its status to active
+            pack.status = 'active';
+            await pack.save();
+        }
+
+
+
+        // Update the user's active pack number
+        if (!user.activePackNumber) {
+            user.activePackNumber = 1;
+        } else {
+            user.activePackNumber += 1;
+        }
+
+        // Save the updated user
+        await user.save();
+
+        res.status(200).json({ message: 'Order marked as completed, user active pack number updated, and pack created/updated', activePackNumber: user.activePackNumber, pack });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: error.message });
     }
 };
+
 
 
 export const cancelOrder = async (req, res) => {
@@ -142,3 +182,4 @@ export const cancelOrder = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+

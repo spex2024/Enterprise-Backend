@@ -24,7 +24,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const URL = "https://main.d1tchh5v04pztk.amplifyapp.com";
-const verify = "https://enterprise-backend-l6pn.onrender.com";
+const verify = "https://enterprise-backend.vercel.app"
 
 
 const sendVerificationEmail = (vendor, emailToken) => {
@@ -280,7 +280,6 @@ export const getCurrentVendor = async (req, res) => {
 export const getSharedVendors = async (req, res) => {
     try {
         const user = req.user; // Assume the user is attached to the request
-
 
 
         if (!user) {

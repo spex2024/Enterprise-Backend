@@ -1,6 +1,7 @@
 // Submit a pack request
 import User from "../model/user.js";
 import PackRequest from "../model/return-pack.js";
+import Pack from "../model/pack.js";
 
 export const submitPackRequest = async (req, res) => {
     const { code } = req.body;
@@ -28,6 +29,7 @@ export const submitPackRequest = async (req, res) => {
 // Approve a pack request
 // Approve a pack request
 // Approve or Reject a pack request
+
 export const handlePackRequest = async (req, res) => {
     const { id, action } = req.body; // action can be 'approve' or 'reject'
 
@@ -44,7 +46,7 @@ export const handlePackRequest = async (req, res) => {
 
         if (action === 'approve') {
             // Approve the pack request
-            packRequest.status = 'Approved';
+            packRequest.status = 'returned';
             await packRequest.save();
 
             // Update the user's returnedPack count, points, and moneyBalance
@@ -52,9 +54,26 @@ export const handlePackRequest = async (req, res) => {
             user.returnedPack = (user.returnedPack || 0) + 1; // Increment returnedPack
             user.points = user.returnedPack * 2; // Set points to twice the returnedPack count
             user.moneyBalance = user.points * 0.50; // Set moneyBalance to points * 0.50
+
+            // Decrease the user's active pack number
+            if (user.activePackNumber > 0) {
+                user.activePackNumber -= 1;
+            }
+
             await user.save();
 
-            res.status(200).json({ message: 'Pack request approved and user rewarded', packRequest });
+            // Find and update the corresponding pack
+            const pack = await Pack.findOne({ userCode: user.code});
+
+            if (pack) {
+                // Update the pack status to 'processed'
+                pack.status = 'returned';
+                await pack.save();
+            } else {
+                console.error('Pack not found for the user on the current date');
+            }
+
+            res.status(200).json({ message: 'Pack request approved, user rewarded, and pack updated', packRequest });
         } else if (action === 'reject') {
             // Reject the pack request
             packRequest.status = 'Rejected';
@@ -69,6 +88,7 @@ export const handlePackRequest = async (req, res) => {
         res.status(500).json({ message: 'Error handling pack request', error });
     }
 };
+
 
 
 
