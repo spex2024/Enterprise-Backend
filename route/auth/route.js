@@ -5,7 +5,7 @@ import {
 } from "../../controller/user.js";
 
 import authenticate from "../../middleware/protected.js";
-import { handlePackRequest, submitPackRequest} from "../../controller/returned-pack.js";
+import {getReturnedPacks, handlePackRequest, submitPackRequest} from "../../controller/returned-pack.js";
 import {getAllVendors} from "../../controller/vendor.js";
  // Adjust the path as necessary
 
@@ -24,6 +24,7 @@ router.post('/logout', signOut);
 router.post('/request', requestPasswordReset);
 router.post('/reset', resetPassword);
 router.post('/return-pack',authenticate, submitPackRequest);
+router.get('/return-pack',authenticate, getReturnedPacks);
 router.post('/approve', handlePackRequest);
 router.put('/update',authenticate, updateUserInfo);
 //

@@ -46,7 +46,7 @@ export const handlePackRequest = async (req, res) => {
 
         if (action === 'approve') {
             // Approve the pack request
-            packRequest.status = 'returned';
+            packRequest.status = 'Approved';
             await packRequest.save();
 
             // Update the user's returnedPack count, points, and moneyBalance
@@ -56,8 +56,8 @@ export const handlePackRequest = async (req, res) => {
             user.moneyBalance = user.points * 0.50; // Set moneyBalance to points * 0.50
 
             // Decrease the user's active pack number
-            if (user.activePackNumber > 0) {
-                user.activePackNumber -= 1;
+            if (user.activePack> 0) {
+                user.activePack -= 1;
             }
 
             await user.save();
@@ -97,6 +97,21 @@ export const getAllReturnedPacks = async (req, res) => {
     try {
         // Find all pack requests
         const packRequests = await PackRequest.find().populate('user');
+
+        res.status(200).json({ packRequests });
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching returned packs', error });
+    }
+};
+
+
+// Get all returned packs for the authenticated user
+export const getReturnedPacks = async (req, res) => {
+    try {
+        const userId = req.user.id; // Get userId from the middleware
+
+        // Find all pack requests for the authenticated user and populate user details
+        const packRequests = await PackRequest.find({ user: userId }).populate('user');
 
         res.status(200).json({ packRequests });
     } catch (error) {

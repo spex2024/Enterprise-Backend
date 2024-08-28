@@ -105,11 +105,15 @@ export const completeOrder = async (req, res) => {
         await vendor.save();
 
         // Find the user associated with this order
-        const user = await User.findById(order.user);
+        const user = await User.findById(order.user).populate('agency');
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
+
+        const packUser = `${user.firstName} ${user.lastName}`;
+         const enterprise = user.agency.company
+
 
         // Check if a pack already exists for the user on the current date
         const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
@@ -120,29 +124,32 @@ export const completeOrder = async (req, res) => {
             pack = await Pack.create({
                 packId: `${user.code}-${currentDate}`,
                 userCode: user.code,
-                userName: user.name,
-                date: currentDate,
-                userAgency: user.agency, // Assuming user has an agency field
+                userName: packUser,
+                agency: enterprise, // Assuming user has an agency field
                 status: 'active'
             });
+
+            user.pack= pack._id;
         } else {
             // If the pack exists, update its status to active
             pack.status = 'active';
             await pack.save();
+
         }
 
 
 
-        // Update the user's active pack number
-        if (!user.activePackNumber) {
-            user.activePackNumber = 1;
+
+        if (user.activePack === undefined) {
+            // Initialize activePackNumber if it does not exist
+            user.activePack = 1;
         } else {
-            user.activePackNumber += 1;
+            // Increment activePackNumber if it already exists
+            user.activePack += 1;
         }
 
         // Save the updated user
         await user.save();
-
         res.status(200).json({ message: 'Order marked as completed, user active pack number updated, and pack created/updated', activePackNumber: user.activePackNumber, pack });
     } catch (error) {
         console.error(error);

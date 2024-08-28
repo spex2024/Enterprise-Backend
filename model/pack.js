@@ -9,26 +9,18 @@ const packSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    date: {
-        type: Date,
-        required: true
-    },
     agency: {
         type: String,
         required: true
     },
     status: {
         type: String,
-        enum: ['active', 'return'],
+        enum: ['active', 'returned'],
         required: true,
         default: 'active'
     },
 
-    order: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Order',
-        required: true
-    }
+
 
 }, { timestamps: true });
 
