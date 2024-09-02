@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import {
+    deleteUser,
     getAllUsers, getCurrentUser, getVendor, requestPasswordReset, resendVerificationEmail, resetPassword,
     signIn, signOut, signUp, updateUserInfo, verifyEmail
 } from "../../controller/user.js";
@@ -26,6 +27,7 @@ router.post('/reset', resetPassword);
 router.post('/return-pack',authenticate, submitPackRequest);
 router.get('/return-pack',authenticate, getReturnedPacks);
 router.post('/approve', handlePackRequest);
+router.delete('/employee/:userId', deleteUser);
 router.put('/update',authenticate, updateUserInfo);
 //
 // router.get('/profile', );
