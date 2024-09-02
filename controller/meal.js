@@ -11,7 +11,6 @@ export const createMeal = async (req, res) => {
 
         try {
             const vendorId = req.vendor.id
-            console.log(vendorId)
 
             // Assuming vendor ID is available from authenticated user
 

@@ -143,10 +143,11 @@ export const completeOrder = async (req, res) => {
         if (user.activePack === undefined) {
             // Initialize activePackNumber if it does not exist
             user.activePack = 1;
-        } else {
-            // Increment activePackNumber if it already exists
+        } else if (user.activePack === 0) {
+            // Increment activePackNumber if it is not 0
             user.activePack += 1;
         }
+
 
         // Save the updated user
         await user.save();
