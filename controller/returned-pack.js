@@ -96,7 +96,12 @@ export const handlePackRequest = async (req, res) => {
 export const getAllReturnedPacks = async (req, res) => {
     try {
         // Find all pack requests
-        const packRequests = await PackRequest.find().populate('user');
+        const packRequests = await PackRequest.find().populate({
+            path : 'user',
+            populate : {
+                path:'agency'
+            }
+        });
 
         res.status(200).json({ packRequests });
     } catch (error) {
@@ -111,7 +116,12 @@ export const getReturnedPacks = async (req, res) => {
         const userId = req.user.id; // Get userId from the middleware
 
         // Find all pack requests for the authenticated user and populate user details
-        const packRequests = await PackRequest.find({ user: userId }).populate('user');
+        const packRequests = await PackRequest.find({ user: userId }).populate({
+            path : 'user',
+            populate : {
+                path:'agency'
+            }
+        });
 
         res.status(200).json({ packRequests });
     } catch (error) {
