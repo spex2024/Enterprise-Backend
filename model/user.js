@@ -16,6 +16,7 @@ const UserSchema = new Schema({
     returnedPack: { type: Number, default: 0 },
     points: { type: Number, default: 0 },
     moneyBalance: { type: Number, default: 0 }, // Add money balance field
+    emissionSaved: { type: Number, default: 0 }, // Add money balance field
     imageUrl: { type: String },
     imagePublicId: { type: String },
     orders: [{ type: Schema.Types.ObjectId, ref: 'Order' }], // Array of Order IDs associated with this User

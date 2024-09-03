@@ -52,7 +52,8 @@ export const handlePackRequest = async (req, res) => {
             // Update the user's returnedPack count, points, and moneyBalance
             const user = packRequest.user;
             user.returnedPack = (user.returnedPack || 0) + 1; // Increment returnedPack
-            user.points = user.returnedPack * 2; // Set points to twice the returnedPack count
+            user.emissionSaved += 0.02
+            user.points = user.returnedPack * user.emissionSaved; // Set points to twice the returnedPack count
             user.moneyBalance = user.points * 0.50; // Set moneyBalance to points * 0.50
 
             // Decrease the user's active pack number
