@@ -10,7 +10,8 @@ import User from "../model/user.js";
 import {Vendor} from "../model/vendor.js";
 dotenv.config();
 const URL = "https://main.d1lolo334q00y7.amplifyapp.com";
-const verify = "https://enterprise-backend.vercel.app";
+// const verify = "https://enterprise-backend.vercel.app";
+const verify = "https://enterprise-backend-l6pn.onrender.com";
 const transporter = nodemailer.createTransport({
     service: "gmail",
     host: "smtp.gmail.com",
