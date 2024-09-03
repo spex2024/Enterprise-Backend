@@ -15,7 +15,8 @@ import PackRequest from "../model/return-pack.js";
 
 dotenv.config();
 const URL = "https://main.d3h2qrol1316a6.amplifyapp.com";
-const verify = "https://enterprise-backend.vercel.app";
+// const verify = "https://enterprise-backend.vercel.app";
+const verify = 'https://enterprise-backend-l6pn.onrender.com';
 
 const transporter = nodemailer.createTransport({
     service: "gmail",

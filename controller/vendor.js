@@ -24,8 +24,8 @@ const transporter = nodemailer.createTransport({
 });
 
 const URL = "https://main.d1tchh5v04pztk.amplifyapp.com";
-const verify = "https://enterprise-backend.vercel.app"
-
+// const verify = "https://enterprise-backend.vercel.app"
+const verify = "https://enterprise-backend-l6pn.onrender.com";
 
 const sendVerificationEmail = (vendor, emailToken) => {
     const url = `${verify}/api/vendor/verify/${emailToken}`;
