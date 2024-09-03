@@ -19,11 +19,11 @@ export const submitPackRequest = async (req, res) => {
             code,
         });
 
-        if (packRequest) {
+
         const pack = await Pack.findOne({ userCode: user.code});
         pack.status = "pending";
 
-        }
+
 
 
         res.status(200).json({ message: 'Pack request submitted successfully', packRequest });
