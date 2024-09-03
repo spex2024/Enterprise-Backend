@@ -19,6 +19,12 @@ export const submitPackRequest = async (req, res) => {
             code,
         });
 
+        if (packRequest) {
+        const pack = await Pack.findOne({ userCode: user.code});
+        pack.status = "pending";
+
+        }
+
 
         res.status(200).json({ message: 'Pack request submitted successfully', packRequest });
     } catch (error) {
@@ -79,6 +85,18 @@ export const handlePackRequest = async (req, res) => {
             // Reject the pack request
             packRequest.status = 'Rejected';
             await packRequest.save();
+
+            const pack = await Pack.findOne({ userCode: user.code});
+
+            if (pack) {
+                // Update the pack status based on its current status
+                if (pack.status === 'active') {
+                    pack.status = 'cancelled';
+                }
+                // If the status is 'returned', we maintain it as 'returned'
+                await pack.save();
+            }
+
 
             res.status(200).json({ message: 'Pack request rejected', packRequest });
         } else {

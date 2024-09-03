@@ -15,7 +15,7 @@ const packSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['active', 'returned'],
+        enum: ['active', 'returned','pending','cancelled'],
         required: true,
         default: 'active'
     },
