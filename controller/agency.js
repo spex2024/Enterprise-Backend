@@ -507,27 +507,57 @@ export const signOut = (req, res) => {
         res.status(500).send('Server Error');
     }
 };
-
 export const addVendor = async (req, res) => {
-    const { agencyId, vendorIds } = req.body; // Extract agencyId and vendorIds from request body
+    const vendors = req.body; // Extract vendor IDs from request body
+    const token = req.cookies.token; // Assuming token is stored in cookies
+    const decode = jwt.decode(token, process.env.JWT_SECRET);
+    const agencyId = decode.agency.id;
 
     // Ensure agencyId and vendorIds are provided
-    if (!agencyId || !vendorIds || !Array.isArray(vendorIds)) {
+    if (!agencyId || !Array.isArray(vendors) || vendors.length === 0) {
         return res.status(400).json({ message: 'Agency ID or vendor IDs not provided or invalid' });
     }
 
     try {
+        // Fetch the current list of vendors for the agency
+        const agency = await Agency.findById(agencyId).select('vendors');
+        if (!agency) {
+            return res.status(404).json({ message: 'Agency not found' });
+        }
+
+        // Check the number of existing vendors for the agency
+        const existingVendorCount = agency.vendors.length;
+        if (existingVendorCount + vendors.length > 2) {
+            return res.status(400).json({ message: 'Cannot add more than two vendors to the agency' });
+        }
+
+        // Check if all provided vendors exist
+        const existingVendors = await Vendor.find({ _id: { $in: vendors } }).select('_id');
+        const existingVendorIds = existingVendors.map(vendor => vendor._id.toString());
+        const nonExistentVendors = vendors.filter(vendorId => !existingVendorIds.includes(vendorId));
+        if (nonExistentVendors.length > 0) {
+            return res.status(400).json({ message: `The following vendor(s) do not exist: ${nonExistentVendors.join(', ')}` });
+        }
+
+        // Check if any vendors are already associated with the agency
+        const alreadyAssociatedVendors = await Vendor.find({ _id: { $in: vendors }, agencies: agencyId }).select('_id');
+        const alreadyAssociatedVendorIds = alreadyAssociatedVendors.map(vendor => vendor._id.toString());
+        const notAssociatedVendors = vendors.filter(vendorId => !alreadyAssociatedVendorIds.includes(vendorId));
+        if (notAssociatedVendors.length === 0) {
+            return res.status(400).json({ message: 'All vendors are already associated with this agency' });
+        }
+
         // Update the Agency by adding the vendorIds to the agency's `vendors` array
         await Agency.findByIdAndUpdate(
             agencyId,
-            { $addToSet: { vendors: { $each: vendorIds } } },  // $addToSet with $each ensures no duplicates
+            { $addToSet: { vendors: { $each: notAssociatedVendors } } }, // $addToSet with $each ensures no duplicates
             { new: true }
         );
 
         // Update each Vendor by adding the agencyId to their `agencies` array
         await Vendor.updateMany(
-            { _id: { $in: vendorIds } },
-            { $addToSet: { agencies: agencyId } },  // $addToSet ensures no duplicates
+            { _id: { $in: notAssociatedVendors } },
+            { $addToSet: { agencies: agencyId } }, // $addToSet ensures no duplicates
             { new: true }
         );
 
@@ -537,4 +567,44 @@ export const addVendor = async (req, res) => {
     }
 };
 
+
+export const disconnectVendor = async (req, res) => {
+    const { userId, vendorId } = req.body; // Extract agency ID (userId) and vendor ID from request body
+
+    // Ensure both userId (agencyId) and vendorId are provided
+    if (!userId || !vendorId) {
+        return res.status(400).json({ message: 'Enterprise ID or Vendor ID not provided or invalid' });
+    }
+
+    try {
+        // Fetch the agency to ensure it exists and has the specified vendor
+        const agency = await Agency.findById(userId).select('vendors');
+        if (!agency) {
+            return res.status(404).json({ message: 'Enterprise not found' });
+        }
+
+        // Check if the vendor is associated with the agency
+        if (!agency.vendors.includes(vendorId)) {
+            return res.status(400).json({ message: 'Vendor is not associated with this agency' });
+        }
+
+        // Remove the vendor from the agency's `vendors` array
+        await Agency.findByIdAndUpdate(
+            userId,
+            { $pull: { vendors: vendorId } }, // $pull removes the vendor from the array
+            { new: true }
+        );
+
+        // Remove the agency from the vendor's `agencies` array
+        await Vendor.findByIdAndUpdate(
+            vendorId,
+            { $pull: { agencies: userId } }, // $pull removes the agency from the vendor's agencies array
+            { new: true }
+        );
+
+        return res.status(200).json({ message: 'Vendor successfully disconnected from the enterprise' });
+    } catch (error) {
+        return res.status(500).json({ message: 'Error disconnecting vendor from agency', error });
+    }
+};
 

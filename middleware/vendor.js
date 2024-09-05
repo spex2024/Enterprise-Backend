@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 
 export const authenticateVendor = (req, res, next) => {
+    console.log('Token from cookies:', req.cookies.token); // Debugging line
+
     const token = req.cookies.token;
 
     if (!token) {
@@ -9,6 +11,7 @@ export const authenticateVendor = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        console.log('Decoded vendor:', decoded.vendor); // Debugging line
         req.vendor = decoded.vendor;
         next();
     } catch (error) {

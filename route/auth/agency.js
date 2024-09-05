@@ -9,7 +9,7 @@ import {
     forgotAgencyPassword,
     resetAgencyPassword,
     resendVerificationEmail,
-    addVendor
+    addVendor, disconnectVendor
 } from "../../controller/agency.js";
 import authenticate from "../../middleware/protected.js";
 import extractUserId from "../../middleware/extract.js";
@@ -22,9 +22,10 @@ router.post('/logout', signOut);
 router.post('/reset', resetAgencyPassword);
 router.post('/request', forgotAgencyPassword);
 router.post('/resend', resendVerificationEmail);
-router.get('/agencies', getAllAgencies);
+router.get('/agencies', authenticate,getAllAgencies);
 router.get('/agency', authenticate ,getCurrentAgency );
-router.get('/add-vendor', authenticate ,extractUserId,addVendor );
+router.post('/add-vendor', authenticate ,addVendor );
+router.post('/disconnect',authenticate, disconnectVendor);
 router.get('/verify/:token', verifyAgencyEmail);
 
 export default router;
