@@ -2,7 +2,7 @@ import Agency from "../model/agency.js";
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
-import jwt from "jsonwebtoken";
+import jwt, {decode} from "jsonwebtoken";
 import { v2 as cloudinary } from 'cloudinary';
 import upload from "../middleware/multer-upload.js";
 import Admin from "../model/admin.js";
@@ -507,4 +507,34 @@ export const signOut = (req, res) => {
         res.status(500).send('Server Error');
     }
 };
+
+export const addVendor = async (req, res) => {
+    const { agencyId, vendorIds } = req.body; // Extract agencyId and vendorIds from request body
+
+    // Ensure agencyId and vendorIds are provided
+    if (!agencyId || !vendorIds || !Array.isArray(vendorIds)) {
+        return res.status(400).json({ message: 'Agency ID or vendor IDs not provided or invalid' });
+    }
+
+    try {
+        // Update the Agency by adding the vendorIds to the agency's `vendors` array
+        await Agency.findByIdAndUpdate(
+            agencyId,
+            { $addToSet: { vendors: { $each: vendorIds } } },  // $addToSet with $each ensures no duplicates
+            { new: true }
+        );
+
+        // Update each Vendor by adding the agencyId to their `agencies` array
+        await Vendor.updateMany(
+            { _id: { $in: vendorIds } },
+            { $addToSet: { agencies: agencyId } },  // $addToSet ensures no duplicates
+            { new: true }
+        );
+
+        return res.status(200).json({ message: 'Vendors associated with the agency successfully' });
+    } catch (error) {
+        return res.status(500).json({ message: 'Error updating vendors and agency', error });
+    }
+};
+
 

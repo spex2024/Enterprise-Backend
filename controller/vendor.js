@@ -65,7 +65,7 @@ export const createVendor = async (req, res) => {
             return res.status(400).json({ message: "Multer error", error: err.message });
         }
 
-        const { company: name, email, location, owner, agencies, password, phone } = req.body;
+        const { company: name, email, location, owner, password, phone } = req.body;
         const profilePhoto = req.file;
 
         if (!name || !location || !phone || !owner) {
@@ -112,7 +112,6 @@ export const createVendor = async (req, res) => {
                 location,
                 phone,
                 password: hashedPassword,
-                agencies: Array.isArray(agencies) ? agencies : [agencies],
                 owner,
                 code: vendorCode,
                 imageUrl: uploadedPhoto ? uploadedPhoto.secure_url : null,
@@ -160,11 +159,7 @@ export const verifyEmail = async (req, res) => {
 
         await Vendor.findOneAndUpdate({ email: decoded.email }, { isVerified: true });
 
-        const agencyIds = vendor.agencies;
-        await Agency.updateMany(
-            { _id: { $in: agencyIds } },
-            { $push: { vendors: vendor._id } }
-        );
+
 
         return res.redirect(`${URL}/verify?status=success`);
     } catch (error) {
