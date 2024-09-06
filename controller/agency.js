@@ -547,7 +547,7 @@ export const addVendor = async (req, res) => {
         const alreadyAssociatedVendorIds = alreadyAssociatedVendors.map(vendor => vendor._id.toString());
         const notAssociatedVendors = vendors.filter(vendorId => !alreadyAssociatedVendorIds.includes(vendorId));
         if (notAssociatedVendors.length === 0) {
-            return res.status(400).json({ message: 'Vendor are already associated with this agency' });
+            return res.status(400).json({ message: 'Vendor(s) are already associated with this agency' });
         }
 
         // Update the Agency by adding the vendorIds to the agency's `vendors` array
