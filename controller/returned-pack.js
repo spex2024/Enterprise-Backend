@@ -45,7 +45,10 @@ export const handlePackRequest = async (req, res) => {
 
     try {
         // Find the pack request by its ID
-        const packRequest = await PackRequest.findById(id).populate('user');
+        const packRequest = await PackRequest.findById(id).populate({
+            path: 'user',
+            populate: { path: 'agency' },
+        });
         if (!packRequest || (packRequest.status !== 'Pending' && action === 'approve')) {
             return res.status(400).json({ message: 'Invalid or already processed request' });
         }
@@ -57,10 +60,12 @@ export const handlePackRequest = async (req, res) => {
 
             // Update the user's returnedPack count, points, and moneyBalance
             const user = packRequest.user;
+            const agency = packRequest.user.agency
             user.returnedPack = (user.returnedPack || 0) + 1; // Increment returnedPack
             user.emissionSaved += 0.02
             user.points = user.returnedPack * user.emissionSaved; // Set points to twice the returnedPack count
             user.moneyBalance = user.points * 0.50; // Set moneyBalance to points * 0.50
+            agency.returnedPack += 1;
 
             // Decrease the user's active pack number
             if (user.activePack> 0) {
