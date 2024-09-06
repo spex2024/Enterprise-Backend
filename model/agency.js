@@ -12,7 +12,7 @@ const AgencySchema = new Schema(
             code: { type: String , required: true },
             password: { type: String, required: true },
             initials:{type:String,required:true},
-            packs: { type: Number, default: 50 },
+            packs: { type: Number, default: 0 },
             issuedPack: { type: Number, default: 0 },
             returnedPack: { type: Number, default: 0 },
             points: { type: Number, default: 0 },
