@@ -25,7 +25,7 @@ router.post('/resend', resendVerificationEmail);
 router.get('/agencies', authenticate,getAllAgencies);
 router.get('/agency', authenticate ,getCurrentAgency );
 router.post('/add-vendor', authenticate ,addVendor );
-router.post('/disconnect',authenticate, disconnectVendor);
+router.post('/disconnect', disconnectVendor);
 router.get('/verify/:token', verifyAgencyEmail);
 
 export default router;

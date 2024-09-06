@@ -242,6 +242,9 @@ export const agencySignIn = async (req, res) => {
         };
 
         const token = generateToken(payload, '1d');
+        agency.token = token;
+        await agency.save();
+
         res.cookie('token', token, {
             httpOnly: true,
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',    // Use 'none' in production, 'lax' otherwise
@@ -544,7 +547,7 @@ export const addVendor = async (req, res) => {
         const alreadyAssociatedVendorIds = alreadyAssociatedVendors.map(vendor => vendor._id.toString());
         const notAssociatedVendors = vendors.filter(vendorId => !alreadyAssociatedVendorIds.includes(vendorId));
         if (notAssociatedVendors.length === 0) {
-            return res.status(400).json({ message: 'All vendors are already associated with this agency' });
+            return res.status(400).json({ message: 'Vendor are already associated with this agency' });
         }
 
         // Update the Agency by adding the vendorIds to the agency's `vendors` array
@@ -561,7 +564,7 @@ export const addVendor = async (req, res) => {
             { new: true }
         );
 
-        return res.status(200).json({ message: 'Vendors associated with the agency successfully' });
+        return res.status(200).json({ message: 'Vendor associated with the agency successfully' });
     } catch (error) {
         return res.status(500).json({ message: 'Error updating vendors and agency', error });
     }

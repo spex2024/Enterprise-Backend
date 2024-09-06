@@ -12,6 +12,7 @@ const AgencySchema = new Schema(
             code: { type: String , required: true },
             password: { type: String, required: true },
             initials:{type:String,required:true},
+            token:{type:String},
             imageUrl: { type: String,  },
             imagePublicId: { type: String,  },
             isVerified: { type: Boolean, default: false }, // Assuming isVerified is a boolean
