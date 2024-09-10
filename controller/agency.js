@@ -518,20 +518,20 @@ export const addVendor = async (req, res) => {
 
     // Ensure agencyId and vendorIds are provided
     if (!agencyId || !Array.isArray(vendors) || vendors.length === 0) {
-        return res.status(400).json({ message: 'Agency ID or vendor IDs not provided or invalid' });
+        return res.status(400).json({ message: 'Enterprise ID or vendor IDs not provided or invalid' });
     }
 
     try {
         // Fetch the current list of vendors for the agency
         const agency = await Agency.findById(agencyId).select('vendors');
         if (!agency) {
-            return res.status(404).json({ message: 'Agency not found' });
+            return res.status(404).json({ message: 'Enterprise not found' });
         }
 
         // Check the number of existing vendors for the agency
         const existingVendorCount = agency.vendors.length;
         if (existingVendorCount + vendors.length > 2) {
-            return res.status(400).json({ message: 'Cannot add more than two vendors to the agency' });
+            return res.status(400).json({ message: 'Cannot add more than two vendors to the enterprise' });
         }
 
         // Check if all provided vendors exist
@@ -547,7 +547,7 @@ export const addVendor = async (req, res) => {
         const alreadyAssociatedVendorIds = alreadyAssociatedVendors.map(vendor => vendor._id.toString());
         const notAssociatedVendors = vendors.filter(vendorId => !alreadyAssociatedVendorIds.includes(vendorId));
         if (notAssociatedVendors.length === 0) {
-            return res.status(400).json({ message: 'Vendor(s) are already associated with this agency' });
+            return res.status(400).json({ message: 'Vendor(s) are already associated with this enterprise' });
         }
 
         // Update the Agency by adding the vendorIds to the agency's `vendors` array
@@ -564,9 +564,9 @@ export const addVendor = async (req, res) => {
             { new: true }
         );
 
-        return res.status(200).json({ message: 'Vendor associated with the agency successfully' });
+        return res.status(200).json({ message: 'Vendor associated with the enterprise successfully' });
     } catch (error) {
-        return res.status(500).json({ message: 'Error updating vendors and agency', error });
+        return res.status(500).json({ message: 'Error updating vendors and enterprise', error });
     }
 };
 
@@ -610,4 +610,44 @@ export const disconnectVendor = async (req, res) => {
         return res.status(500).json({ message: 'Error disconnecting vendor from agency', error });
     }
 };
+export const disconnectUser = async (req, res) => {
+    const { userId, employeeId } = req.body; // Extract agency ID (userId) and user ID (employeeId) from request body
+
+    // Ensure both userId (agencyId) and employeeId are provided
+    if (!userId || !employeeId) {
+        return res.status(400).json({ message: 'Enterprise ID or User ID not provided or invalid' });
+    }
+
+    try {
+        // Fetch the agency to ensure it exists and has the specified user
+        const agency = await Agency.findById(userId).select('users');
+        if (!agency) {
+            return res.status(404).json({ message: 'Enterprise not found' });
+        }
+
+        // Check if the user is associated with the agency
+        if (!agency.users.includes(employeeId)) {
+            return res.status(400).json({ message: 'User is not associated with this enterprise' });
+        }
+
+        // Remove the user from the agency's `users` array
+        await Agency.findByIdAndUpdate(
+            userId,
+            { $pull: { users: employeeId } }, // $pull removes the user from the array
+            { new: true }
+        );
+
+        // Set the user's `agency` field to null (or undefined) to disconnect from the agency
+        await User.findByIdAndUpdate(
+            employeeId,
+            { $set: { agency: null } }, // Clear the agency field
+            { new: true }
+        );
+
+        return res.status(200).json({ message: 'User successfully disconnected from the enterprise' });
+    } catch (error) {
+        return res.status(500).json({ message: 'Error disconnecting user from enterprise', error });
+    }
+};
+
 

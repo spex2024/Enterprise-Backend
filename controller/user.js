@@ -51,17 +51,32 @@ const sendResetEmail = (user, resetToken) => {
 
 
 
-
-
-
-
-
-
 // Function to generate unique user code based on agency's initials and random 3-digit counter
 const generateUserCode = (agencyInitials, firstName, lastName) => {
     const counter = Math.floor(Math.random() * 900) + 100; // Generates a random number between 100 and 999
     return `${agencyInitials}${firstName.charAt(0).toUpperCase()}${lastName.charAt(0).toUpperCase()}${counter}`;
 };
+
+// Function to update user code while keeping the numeric part constant
+const updateUserCode = (userCode, updatedFirstName, updatedLastName) => {
+    // Length of the numeric part (assumed to be 3 digits)
+    const numericPartLength = 3;
+
+    // Extract the numeric part from the userCode
+    const numericPart = userCode.slice(-numericPartLength); // Last 3 digits
+
+    // Extract the agency initials (everything before the initials and numeric part)
+    const agencyInitials = userCode.slice(0, -numericPartLength - 2); // Remove last 5 characters (initials and numeric)
+
+    // Generate new initials based on updated first and last names
+    const newInitials = `${updatedFirstName.charAt(0).toUpperCase()}${updatedLastName.charAt(0).toUpperCase()}`;
+
+    // Reconstruct the updated user code
+    const updatedUserCode = `${agencyInitials}${newInitials}${numericPart}`;
+
+    return updatedUserCode;
+};
+
 
 const generateToken = (payload, expiresIn) => {
     return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn });
@@ -437,51 +452,42 @@ export const updateUserInfo = async (req, res) => {
             return res.status(400).json({ message: "Multer error", error: err.message });
         }
 
-        const { firstName, lastName, phone } = req.body;
+        const { firstName, lastName, phone ,email } = req.body;
         const profilePhoto = req.file;
-
-
+        const userId = req.params.userId;
 
         try {
-            const user = await User.findById(req.user._id);
+            const user = await User.findById(userId);
+            if (!user) return res.status(404).json({ message: "User not found" });
+            const existingUser = await User.findOne({ $or: [{ email }, { phone }] });
+            const existingVendor = await Vendor.findOne({ $or: [{ email }, { phone }] });
+            const existingAgency = await Agency.findOne({ $or: [{ email }, { phone }] });
+            const existingAdmin = await Admin.findOne({ $or: [{ email }, { phone }] });
 
-            if (!user) {
-                return res.status(404).json({ message: "User not found" });
-            }
-
-            if(firstName){
-
-            user.firstName = firstName;
-            }
-
-            if(lastName){
-
-            user.lastName = lastName;
-            }
-
-            if(phone){
-
-                user.phone = phone;
-
+            if (existingUser || existingVendor || existingAgency || existingAdmin) {
+                return res.status(400).json({ message: "Email or phone already in use by another account" });
             }
 
 
+            // Update user info
+            if (firstName || lastName || phone) {
+                user.firstName = firstName || user.firstName;
+                user.lastName = lastName || user.lastName;
+                user.phone = phone || user.phone;
+                user.email = email || user.email;
+            }
+            user.code = updateUserCode(user.code, firstName, lastName);
+            // Handle profile photo update
             if (profilePhoto) {
-                // Delete the old profile photo from Cloudinary
+                // Delete old image from Cloudinary
                 if (user.imagePublicId) {
                     await cloudinary.uploader.destroy(user.imagePublicId);
                 }
 
-                // Upload the new profile photo to Cloudinary
+                // Upload new image to Cloudinary
                 const uploadedPhoto = await new Promise((resolve, reject) => {
                     cloudinary.uploader.upload_stream(
-                        {
-                            folder: 'meals',
-                            transformation: [
-                                { quality: 'auto', fetch_format: 'auto' },
-                                { crop: 'fill', gravity: 'auto', width: 500, height: 600 }
-                            ]
-                        },
+                        { folder: 'meals', transformation: [{ crop: 'fill', width: 500, height: 600 }] },
                         (error, result) => {
                             if (error) {
                                 return reject(error);
@@ -491,19 +497,21 @@ export const updateUserInfo = async (req, res) => {
                     ).end(profilePhoto.buffer);
                 });
 
+                // Update user with new image details
                 user.imageUrl = uploadedPhoto.secure_url;
                 user.imagePublicId = uploadedPhoto.public_id;
             }
 
             await user.save();
+            res.status(200).json({ message: "User updated successfully", user });
 
-            res.status(200).json({ message: "User information updated successfully", user });
         } catch (error) {
             console.error(error.message);
-            res.status(500).json({ message: "Server error", error });
+            res.status(500).json({ message: error.message });
         }
     });
 };
+
 
 export const deleteUser = async (req, res) => {
     const userId = req.params.userId;

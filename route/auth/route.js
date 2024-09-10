@@ -28,7 +28,7 @@ router.post('/return-pack',authenticate, submitPackRequest);
 router.get('/return-pack',authenticate, getReturnedPacks);
 router.post('/approve', handlePackRequest);
 router.delete('/employee/:userId', deleteUser);
-router.put('/update',authenticate, updateUserInfo);
+router.put('/employee/:userId', updateUserInfo);
 //
 // router.get('/profile', );
 
