@@ -38,8 +38,6 @@ const sendVerificationEmail = (user, emailToken) => {
     });
 }
 
-
-
 const sendResetEmail = (user, resetToken) => {
     const url = `${URL}/reset/password-reset?token=${resetToken}`;
     transporter.sendMail({
@@ -48,8 +46,6 @@ const sendResetEmail = (user, resetToken) => {
         html: `Click <a href="${url}">here</a> to reset your password.`,
     });
 };
-
-
 
 // Function to generate unique user code based on agency's initials and random 3-digit counter
 const generateUserCode = (agencyInitials, firstName, lastName) => {
@@ -176,7 +172,6 @@ export const signUp = async (req, res) => {
         }
     });
 };
-
 
 export const verifyEmail = async (req, res) => {
     const token = req.params.token;
@@ -369,8 +364,6 @@ export const getVendor = async (req, res) => {
     }
 };
 
-
-
 export const signOut = (req, res) => {
     try {
         res.clearCookie('token', {
@@ -383,10 +376,6 @@ export const signOut = (req, res) => {
         res.status(500).send('Server Error');
     }
 };
-
-
-
-
 
 export const requestPasswordReset = async (req, res) => {
     const { email } = req.body;
@@ -415,7 +404,6 @@ export const requestPasswordReset = async (req, res) => {
     }
 };
 
-
 export const resetPassword = async (req, res) => {
 
     const {newPassword:password , token} = req.body;
@@ -442,8 +430,6 @@ export const resetPassword = async (req, res) => {
         res.status(500).send(error.message);
     }
 };
-
-
 
 export const updateUserInfo = async (req, res) => {
     const uploadSingle = upload.single('profilePhoto');
@@ -511,7 +497,6 @@ export const updateUserInfo = async (req, res) => {
         }
     });
 };
-
 
 export const deleteUser = async (req, res) => {
     const userId = req.params.userId;

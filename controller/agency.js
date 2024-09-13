@@ -611,35 +611,36 @@ export const disconnectVendor = async (req, res) => {
     }
 };
 export const disconnectUser = async (req, res) => {
-    const { userId, employeeId } = req.body; // Extract agency ID (userId) and user ID (employeeId) from request body
+    const { entId, userId } = req.body
+    console.log(entId,userId); // Extract agency ID (userId) and user ID (employeeId) from request body
 
     // Ensure both userId (agencyId) and employeeId are provided
-    if (!userId || !employeeId) {
+    if (!userId || !entId) {
         return res.status(400).json({ message: 'Enterprise ID or User ID not provided or invalid' });
     }
 
     try {
         // Fetch the agency to ensure it exists and has the specified user
-        const agency = await Agency.findById(userId).select('users');
+        const agency = await Agency.findById(entId).select('users');
         if (!agency) {
             return res.status(404).json({ message: 'Enterprise not found' });
         }
-
+        console.log(agency)
         // Check if the user is associated with the agency
-        if (!agency.users.includes(employeeId)) {
+        if (!agency.users.includes(userId)) {
             return res.status(400).json({ message: 'User is not associated with this enterprise' });
         }
 
         // Remove the user from the agency's `users` array
         await Agency.findByIdAndUpdate(
-            userId,
-            { $pull: { users: employeeId } }, // $pull removes the user from the array
+            entId,
+            { $pull: { users: userId } }, // $pull removes the user from the array
             { new: true }
         );
 
         // Set the user's `agency` field to null (or undefined) to disconnect from the agency
         await User.findByIdAndUpdate(
-            employeeId,
+            userId,
             { $set: { agency: null } }, // Clear the agency field
             { new: true }
         );
